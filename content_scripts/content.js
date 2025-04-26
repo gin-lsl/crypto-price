@@ -73,10 +73,12 @@ async function handleSelection() {
         symbol
       });
       
-      if (response?.price) {
-        const usdValue = amount * response.price;
+      if (response?.prices) {
         chrome.storage.sync.get(['currency'], (result) => {
-          showTip(selectedText, usdValue, result.currency || 'USD');
+          const currency = result.currency || 'USD';
+          const price = response.prices[currency] || response.prices.USD;
+          const convertedValue = amount * price;
+          showTip(selectedText, convertedValue, currency);
         });
       }
     }

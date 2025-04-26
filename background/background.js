@@ -13,7 +13,7 @@ const priceCache = {
 };
 
 // 更新价格缓存
-const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,solana,bitcoin&vs_currencies=usd';
+const CRYPTO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,solana,bitcoin&vs_currencies=usd,cny,eur';
 const MAX_RETRIES = 3;
 
 async function fetchWithRetry(url, retries = MAX_RETRIES) {
@@ -33,14 +33,27 @@ async function fetchWithRetry(url, retries = MAX_RETRIES) {
 
 async function updatePriceCache() {
   try {
-    const data = await fetchWithRetry(API_URL);
-    if (!data?.ethereum?.usd || !data?.solana?.usd || !data?.bitcoin?.usd) {
-      throw new Error('Invalid API response format');
+    const cryptoData = await fetchWithRetry(CRYPTO_API_URL);
+
+    if (!cryptoData?.ethereum?.usd || !cryptoData?.solana?.usd || !cryptoData?.bitcoin?.usd) {
+      throw new Error('Invalid crypto API response format');
     }
     
-    priceCache.ETH = data.ethereum.usd;
-    priceCache.SOL = data.solana.usd;
-    priceCache.BTC = data.bitcoin.usd;
+    priceCache.ETH = {
+      USD: cryptoData.ethereum.usd,
+      CNY: cryptoData.ethereum.cny,
+      EUR: cryptoData.ethereum.eur
+    };
+    priceCache.SOL = {
+      USD: cryptoData.solana.usd,
+      CNY: cryptoData.solana.cny,
+      EUR: cryptoData.solana.eur
+    };
+    priceCache.BTC = {
+      USD: cryptoData.bitcoin.usd,
+      CNY: cryptoData.bitcoin.cny,
+      EUR: cryptoData.bitcoin.eur
+    };
     priceCache.lastUpdated = Date.now();
   } catch (error) {
     console.error('Failed to update price cache:', error);
@@ -67,7 +80,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       }
       
       sendResponse({
-        price: priceCache[request.symbol],
+        prices: priceCache[request.symbol],
         lastUpdated: priceCache.lastUpdated
       });
     }
