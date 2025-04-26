@@ -1,5 +1,5 @@
 // 匹配加密货币文本的正则表达式
-const CRYPTO_REGEX = /(\d+(?:\.\d+)?)\s*(ETH|SOL|BTC)/i;
+const CRYPTO_REGEX = /([\d,]+(?:\.\d+)?)\s*(ETH|SOL|BTC)/i;
 
 // 创建并显示tip元素
 function showTip(text, usdValue, currency) {
@@ -64,7 +64,7 @@ async function handleSelection() {
     const match = selectedText.match(CRYPTO_REGEX);
     
     if (match) {
-      const amount = parseFloat(match[1]);
+      const amount = parseFloat(match[1].replace(/,/g, ''));
       const symbol = match[2].toUpperCase();
       
       // 发送消息到background获取价格
