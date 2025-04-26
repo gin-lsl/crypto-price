@@ -1,7 +1,12 @@
 // 匹配加密货币文本的正则表达式
 const CRYPTO_REGEX = /([\d,]+(?:\.\d+)?)\s*(ETH|SOL|BTC)/i;
 
-// 创建并显示tip元素
+/**
+ * 创建并显示tip元素
+ * @param {string} text 
+ * @param {number} usdValue 
+ * @param {string} currency 
+ */
 function showTip(text, usdValue, currency) {
   try {
     const tip = document.createElement('div');
@@ -12,7 +17,12 @@ function showTip(text, usdValue, currency) {
       EUR: '€'
     };
     const symbol = currencySymbols[currency] || '$';
-    tip.textContent = `${text} ≈ ${symbol}${usdValue.toFixed(2)}`;
+    const formattedValue = new Intl.NumberFormat(undefined, {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(usdValue);
+    tip.textContent = `${text} ≈ ${symbol} ${formattedValue}`;
     
     // 样式设置
     Object.assign(tip.style, {
