@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   // 获取DOM元素
-  const defaultCurrency = document.getElementById('defaultCurrency');
+  const currencySelector = document.getElementById('currency-selector');
   const refreshInterval = document.getElementById('refreshInterval');
   const intervalValue = document.getElementById('intervalValue');
   const saveButton = document.getElementById('saveSettings');
@@ -13,9 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 加载保存的设置和状态
-  chrome.storage.sync.get(['defaultCurrency', 'refreshInterval', 'lastUpdated'], (result) => {
-    if (result.defaultCurrency) {
-      defaultCurrency.value = result.defaultCurrency;
+  chrome.storage.sync.get(['currency', 'refreshInterval', 'lastUpdated'], (result) => {
+    if (result.currency) {
+      currencySelector.value = result.currency;
+    } else {
+      currencySelector.value = 'USD'; // 默认值
     }
     if (result.refreshInterval) {
       refreshInterval.value = result.refreshInterval;
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const settings = {
-      defaultCurrency: defaultCurrency.value,
+      currency: currencySelector.value,
       refreshInterval: interval,
       lastUpdated: Date.now()
     };

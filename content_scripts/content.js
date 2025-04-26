@@ -2,11 +2,17 @@
 const CRYPTO_REGEX = /(\d+(?:\.\d+)?)\s*(ETH|SOL|BTC)/i;
 
 // 创建并显示tip元素
-function showTip(text, usdValue) {
+function showTip(text, usdValue, currency) {
   try {
     const tip = document.createElement('div');
     tip.className = 'crypto-tip';
-    tip.textContent = `${text} ≈ $${usdValue.toFixed(2)}`;
+    const currencySymbols = {
+      USD: '$',
+      CNY: '¥',
+      EUR: '€'
+    };
+    const symbol = currencySymbols[currency] || '$';
+    tip.textContent = `${text} ≈ ${symbol}${usdValue.toFixed(2)}`;
     
     // 样式设置
     Object.assign(tip.style, {
@@ -69,7 +75,9 @@ async function handleSelection() {
       
       if (response?.price) {
         const usdValue = amount * response.price;
-        showTip(selectedText, usdValue);
+        chrome.storage.sync.get(['currency'], (result) => {
+          showTip(selectedText, usdValue, result.currency || 'USD');
+        });
       }
     }
   } catch (error) {
